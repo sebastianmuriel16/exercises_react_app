@@ -4,6 +4,9 @@ import Icon from '../assets/icons/gym.png'
 
 const BodyPart = ({ item, bodyPart, setBodyPart }) => {
 
+
+    const auxBodyPart = item.name ? item.name : item
+
     return (
         <Stack
             type={'button'}
@@ -12,7 +15,7 @@ const BodyPart = ({ item, bodyPart, setBodyPart }) => {
             className='bodyPart-card'
             sx={{
 
-                borderTop: bodyPart === item ? '4px solid #FF2625' : '',
+                borderTop: bodyPart === auxBodyPart ? '4px solid #FF2625' : '',
                 background: '#fff',
                 borderBottomLeftRadius: '20px',
                 width: '272px',
@@ -23,7 +26,7 @@ const BodyPart = ({ item, bodyPart, setBodyPart }) => {
 
             }}
             onClick={() => {
-                setBodyPart(item.name)
+                setBodyPart(auxBodyPart)
                 window.scrollTo({ top: 1800, left: 100, behavior: 'smooth' })
             }}
 

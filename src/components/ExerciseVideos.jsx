@@ -11,28 +11,36 @@ const ExerciseVideos = ({ exerciseVideos, name }) => {
                     gap: { lg: "110px", xs: "0" }
                 }}
             >
-                {exerciseVideos?.slice(0, 3).map((item) => {
-                    return (
-                        <a
-                            key={item.video.videoId}
-                            className="exercise-video"
-                            href={`https://www.youtube.com/watch?v=${item.video.videoId}`}
-                            target="_blank"
-                            rel="noreferrer"
-                        >
-                            <img src={item.video.thumbnails[0].url} alt={item.video.title} />
-                            <Box>
-                                <Typography variant="h5" color="#000">
-                                    {item.video.title}
-                                </Typography>
-                                <Typography variant="h6" color="#000">
-                                    {item.video.channelName}
-                                </Typography>
-                            </Box>
+                {exerciseVideos
+                    .filter(item => item.video)
+                    .slice(0, 3)
+                    .map((item, index) => {
+                        return (
+                            <a
+                                // Añadí index al key por si acaso, pero item.video.videoId es mejor
+                                key={item.video.videoId || index}
+                                className="exercise-video"
+                                href={`https://www.youtube.com/watch?v=${item.video.videoId}`}
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                <img
+                                    src={item.video.thumbnails[0].url}
+                                    alt={item.video.title}
+                                    style={{ borderTopLeftRadius: '20px' }}
+                                />
+                                <Box>
+                                    <Typography variant="h5" color="#000">
+                                        {item.video.title}
+                                    </Typography>
+                                    <Typography variant="h6" color="#000">
+                                        {item.video.channelName}
+                                    </Typography>
+                                </Box>
 
-                        </a>
-                    )
-                })}
+                            </a>
+                        )
+                    })}
             </Stack>
         </Box >
     )

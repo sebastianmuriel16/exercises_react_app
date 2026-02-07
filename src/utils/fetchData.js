@@ -1,3 +1,5 @@
+const baseUrlExercises = 'https://edb-with-videos-and-images-by-ascendapi.p.rapidapi.com/api/v1'
+
 export const youtubeOptions = {
     method: 'GET',
     headers: {
@@ -14,9 +16,22 @@ export const youtubeFetch = async (url) => {
 
 };
 
-export const fetchData = async (url) => {
-    const response = await fetch(url)
-    const data = await response.json()
-    const exercises = data.data
-    return exercises
+export const fetchExercises = async (endpoint) => {
+    const url = `${baseUrlExercises}${endpoint}`;
+    const options = {
+        method: 'GET',
+        headers: {
+            'x-rapidapi-key': import.meta.env.VITE_RAPIDAPI_EXERCISES_KEY,
+            'x-rapidapi-host': 'edb-with-videos-and-images-by-ascendapi.p.rapidapi.com'
+        }
+    };
+
+    try {
+        const response = await fetch(url, options);
+        const result = await response.json();
+        return result;
+    } catch (error) {
+        console.error(error);
+    }
+
 }

@@ -6,7 +6,7 @@ import EquipmentImage from '../assets/icons/equipment.png'
 
 const Detail = ({ exerciseDetail }) => {
 
-    const { bodyParts, gifUrl, name, targetMuscles, equipments, instructions } = exerciseDetail
+    const { bodyParts, imageUrl, name, targetMuscles, equipments, instructions } = exerciseDetail
 
     const extraDetail = [
         {
@@ -32,7 +32,7 @@ const Detail = ({ exerciseDetail }) => {
                 alignItems: 'center'
             }}
         >
-            <img src={gifUrl} alt={name} loading="lazy" className='detail-image' />
+            <img src={imageUrl} alt={name} loading="lazy" className='detail-image' />
             <Stack sx={{ gap: { lg: '35px', xs: '20px' } }}>
                 <Typography variant={"h3"} >
                     {name}

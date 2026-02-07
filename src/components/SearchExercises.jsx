@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react"
 import { Box, Button, Stack, TextField, Typography } from "@mui/material"
 import { HorizontalScrollbar } from "./HorizontalScrollbar"
-import { fetchData } from "../utils/fetchData"
+import { fetchExercises } from "../utils/fetchData"
 const SearchExercises = ({ setExercises, bodyPart, setBodyPart }) => {
     const [search, setSearch] = useState("")
     const [bodyParts, setBodyParts] = useState([])
 
     useEffect(() => {
         const fetchExercisesData = async () => {
-            const bodyPartsData = await fetchData('https://www.exercisedb.dev/api/v1/bodyparts')
-            setBodyParts(['all', ...bodyPartsData])
+            const bodyPartsData = await fetchExercises('/bodyparts');
+            setBodyParts(['all', ...bodyPartsData.data])
 
         }
         fetchExercisesData()
@@ -17,7 +17,7 @@ const SearchExercises = ({ setExercises, bodyPart, setBodyPart }) => {
 
     const handleSearch = async () => {
         if (search) {
-            const searchedExercises = await fetchData(`http://www.exercisedb.dev/api/v1/exercises/filter?search=${search}&limit=100`);
+            const searchedExercises = await fetchExercises(`/exercises?keywords=${search}`);
 
             // const searchedExercises = exercisesData.filter((exercise) => {
             //     return (
@@ -30,7 +30,7 @@ const SearchExercises = ({ setExercises, bodyPart, setBodyPart }) => {
             // )
 
             setSearch("")
-            setExercises(searchedExercises)
+            setExercises(searchedExercises.data)
         }
 
     }

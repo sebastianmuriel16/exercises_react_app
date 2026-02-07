@@ -1,37 +1,71 @@
 import { useEffect, useState } from "react"
-import { Pagination } from "@mui/material"
+import { CustomPagination } from "./CustomPagination"
 import { Box, Stack, Typography } from '@mui/material'
 import { ExerciseCard } from "./ExerciseCard"
 
-import { fetchData } from "../utils/fetchData"
+import { fetchExercises } from "../utils/fetchData"
 
 const Exercises = ({ setExercises, bodyPart, exercises }) => {
+
+    const [nextCursor, setNextCursor] = useState(null)
+    const [prevCursor, setPrevCursor] = useState(null)
+    const [hasNext, setHasNext] = useState(false)
+    const [hasPrevious, setHasPrevious] = useState(false)
     const [currentPage, setCurrentPage] = useState(1)
-    const exercisesPerPage = 9
 
-    const indexOfLastExercise = currentPage * exercisesPerPage;
-    const indexOfFirstExercise = indexOfLastExercise - exercisesPerPage;
-
-    const currentExercises = exercises.slice(indexOfFirstExercise, indexOfLastExercise);
-
-    const paginate = (e, value) => {
-        setCurrentPage(value);
-        window.scrollTo({ top: 1800, behavior: "smooth" })
+    const updateMeta = (meta) => {
+        setHasNext(!!meta?.hasNextPage)
+        setNextCursor(meta?.nextCursor || null)
+        setHasPrevious(!!meta?.hasPreviousPage)
+        setPrevCursor(meta?.previousCursor || null)
     }
 
-    useEffect(() => {
-        const fetchExercisesByBodyPart = async () => {
-            let exercisesData = []
+    const fetchPage = async (cursor = null, direction = 'initial') => {
 
-            if (bodyPart !== 'all') {
-                exercisesData = await fetchData(`https://www.exercisedb.dev/api/v1/bodyparts/${bodyPart}/exercises?offset=0&limit=100`)
-                setExercises(exercisesData)
+        let url = `/exercises`
+
+        if (bodyPart !== 'all') {
+            url += `?bodyParts=${bodyPart}`
+        }
+
+        if (cursor) {
+            const separator = url.includes('?') ? '&' : '?';
+            if (direction === 'next') {
+                url += `${separator}after=${cursor}`
+            }
+            else {
+                url += `${separator}before=${cursor}`
             }
         }
 
-        fetchExercisesByBodyPart()
+        const exercisesData = await fetchExercises(url)
+        setExercises(exercisesData.data)
+        updateMeta(exercisesData.meta)
+    }
 
+
+
+    useEffect(() => {
+        fetchPage();
+        setCurrentPage(1)
     }, [bodyPart])
+
+
+    const handleNextPage = () => {
+
+        if (hasNext && nextCursor) {
+            fetchPage(nextCursor, 'next')
+            setCurrentPage(prev => prev + 1)
+        }
+    }
+
+
+    const handlePreviousPage = () => {
+        if (hasPrevious && prevCursor) {
+            fetchPage(prevCursor, 'prev')
+            setCurrentPage(prev => prev - 1)
+        }
+    }
 
     return (
         <Box id="exercises"
@@ -45,7 +79,7 @@ const Exercises = ({ setExercises, bodyPart, exercises }) => {
             </Typography>
             <Stack direction={"row"} sx={{ gap: { lg: "110px", xs: "50px" } }} flexWrap={"wrap"} justifyContent={"center"}>
                 {
-                    currentExercises.map((exercise) => {
+                    exercises.map((exercise) => {
                         return (
                             <ExerciseCard key={exercise.exerciseId} exercise={exercise} />
                         )
@@ -53,18 +87,14 @@ const Exercises = ({ setExercises, bodyPart, exercises }) => {
                 }
             </Stack>
             <Stack mt={"100px"} alignItems={"center"}>
-                {
-                    exercises.length > 9 &&
-                    (
-                        <Pagination
-                            color="standard"
-                            shape="rounded"
-                            count={Math.ceil(exercises.length / exercisesPerPage)}
-                            page={currentPage}
-                            onChange={paginate}
-                            size="large" />
-                    )
-                }
+                <CustomPagination
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                    nextPageHandler={handleNextPage}
+                    prevPageHandler={handlePreviousPage}
+                    hasNext={hasNext}
+                    hasPrevious={hasPrevious}
+                />
             </Stack>
         </Box>
     )
